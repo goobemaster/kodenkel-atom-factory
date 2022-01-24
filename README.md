@@ -6,7 +6,7 @@ You can try it out at: https://www.kodenkel.com/games/atom-factory/
 
 ![Showcase of the mini-game running in a browser](showcase.jpg)
 
-The game was designed to be played on monitors with at least HD resolution. Levels are comprised of 40x30 tiles, which makes the levels more challengeing, and varied. That said, the game works on mobile phones, but the control may be tricky there. 
+The game was designed to be played on monitors with at least HD resolution. Levels are comprised of 40x30 tiles, which makes the levels more challengeing, and varied. That said, the game works on mobile phones, but the control may be tricky there due to the small screen size. 
 
 Have fun!
 

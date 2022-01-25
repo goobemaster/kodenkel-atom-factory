@@ -9,10 +9,10 @@ import { Sound, SoundFX } from './Sound';
 import { UserAgent } from './UserAgent';
 
 export class Application {
-  private static CHEAT_MODE = true;
+  private static CHEAT_MODE = false;
   private static SVG_WIDTH: number = 1280;
   private static SVG_HEIGHT: number = 720;
-  private isMobile: boolean = UserAgent.hasTouchScreen();
+  public static isMobile: boolean = UserAgent.hasTouchScreen();
   private static data: CachedJSONData;
   private static title: Title;
   private static intro: Intro;
@@ -24,7 +24,7 @@ export class Application {
     Application.data = new CachedJSONData('atom-factory-data.json', (data: CachedJSONData) => {
       Application.model = new Model(data);
 
-      if (this.isMobile) {
+      if (Application.isMobile) {
         window.addEventListener('deviceorientation', () => {
           this.onDeviceOrientation();
         }, true);

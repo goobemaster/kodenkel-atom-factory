@@ -11,19 +11,18 @@ export class Title {
         document.querySelector('section#display').classList.add('title-bg');
 
         setTimeout(() => {
-            this.surface.query('#start').click(() => {
+            this.surface.onClickOrTouch('#start', () => {
                 this.onStart(data);
             });
-            this.surface.query('#start-text').click(() => {
+            this.surface.onClickOrTouch('#start-text', () => {
                 this.onStart(data);
-            });        
-            
-            this.surface.query('#sound-box').click(() => {
+            });
+            this.surface.onClickOrTouch('#sound-box', () => {
                 this.onToggleSound(data);
-            });  
-            this.surface.query('#sound-text').click(() => {
+            });
+            this.surface.onClickOrTouch('#sound-text', () => {
                 this.onToggleSound(data);
-            });    
+            });   
             
             let userData = data.getObjectByKey('user');
             if (userData === undefined || userData === null) {

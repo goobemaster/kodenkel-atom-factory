@@ -9,13 +9,13 @@ export class Intro {
         this.surface = surface;
 
         setTimeout(() => {
-            this.surface.query('#skip').click(() => {
+            this.surface.onClickOrTouch('#skip', () => {
                 this.tearDown();
-                Application.onContinueGame();
+                Application.onContinueGame();                
             });
-            this.surface.query('#skip-text').click(() => {
+            this.surface.onClickOrTouch('#skip-text', () => {
                 this.tearDown();
-                Application.onContinueGame();
+                Application.onContinueGame();                
             });
         }, 1000);
 

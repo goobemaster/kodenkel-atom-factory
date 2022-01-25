@@ -1,5 +1,6 @@
 
 import Snap, { Fragment, Paper } from "snapsvg";
+import { Application } from "../main";
 
 export class SVGSurface {
     private paper: Paper;
@@ -117,6 +118,39 @@ export class SVGSurface {
 
     public isReady(): boolean {
         return this.paper !== undefined && this.paper !== null;
+    }
+
+    public onClickOrTouch(nodeQuery: string, callback: (element: Snap.Element, event: MouseEvent) => void): void {
+        let element = this.query(nodeQuery);
+        if (element === null) return;
+
+        if (Application.isMobile) {
+            element.touchstart((event: MouseEvent) => {
+                callback(element, event);
+            });
+        } else {
+            element.click((event: MouseEvent) => {
+                callback(element, event);
+            });
+        }
+
+        element.mousedown(() => { return false; });
+    }
+
+    public static onClickOrTouchElement(element: Snap.Element, callback: (element: Snap.Element, event: MouseEvent) => void): void {
+        if (element === undefined || element === null) return;
+
+        if (Application.isMobile) {
+            element.touchstart((event: MouseEvent) => {
+                callback(element, event);
+            });
+        } else {
+            element.click((event: MouseEvent) => {
+                callback(element, event);
+            });
+        }
+
+        element.mousedown(() => { return false; });
     }
 }    
 

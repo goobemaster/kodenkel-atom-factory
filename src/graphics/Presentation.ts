@@ -1,3 +1,4 @@
+import { TIMEOUT } from "dns";
 import { Block, Level, Bonds, BondType, Atom } from "../data/Level";
 import { Model } from "../data/Model";
 import { Application, GameState } from "../main";
@@ -81,7 +82,7 @@ export class Presentation {
                         if (this.model.getSpecialEraser()) {
                             const blockTranslation = Presentation.getBlockTranslation(x, y);
                             this.surface.prependFragment('assets/images/block_wall.svg', id, 'g', translation, (element) => {
-                                element.click(() => {
+                                SVGSurface.onClickOrTouchElement(element, () => {
                                     if (this.model.isPlacingSpecialEraser()) {
                                         level.eraseWall(x, y);
                                         this.model.eraserSpecialPlaced();
@@ -100,7 +101,7 @@ export class Presentation {
                         if (this.model.getSpecialTunnel()) {
                             const blockTranslation = Presentation.getBlockTranslation(x, y);
                             this.surface.prependFragment('assets/images/block_empty.svg', id, 'g', translation, (element) => {
-                                element.click(() => {
+                                SVGSurface.onClickOrTouchElement(element, () => {
                                     if (this.model.isPlacingSpecialTunnel()) {
                                         level.placeTunnel(x, y);
                                         this.model.tunnelSpecialPlaced();
@@ -108,7 +109,7 @@ export class Presentation {
                                         this.surface.remove(SVGSelector.TUNNEL_TEXT);
                                         element.remove();
                                         this.surface.prependFragment('assets/images/block_tunnel.svg', 'btunnel', 'g', blockTranslation);
-                                    }
+                                    }                                    
                                 });
                             });
                         } else {
@@ -132,10 +133,8 @@ export class Presentation {
             }
         });
 
-        // There stood a hack. This is somewhat better.
         for (let i = 0; i < atomQueue.length; i++) {
             let atomData = atomQueue[i];
-            this.buildBonds(atomData.bonds, atomData.translation, atomData.id);
             this.surface.prependFragment('assets/images/block_empty.svg', atomData.id, 'g', atomData.translation);
             this.surface.appendFragment('assets/images/atom_' + atomData.atom + '.svg', atomData.id.replace('b', 'a'), 'g', atomData.translation, false, (element) => {
                 element.mousedown((event: MouseEvent) => {
@@ -146,6 +145,7 @@ export class Presentation {
                 });
                 element.attr({class: 'pointer'});
             });
+            this.buildBonds(atomData.bonds, atomData.translation, atomData.id);
         }
         this.arrows = new ArrowControl(this.surface);
         this.surface.appendFragment(`assets/images/molecule_box_${this.model.getLevel().toString()}.svg`, SVGSelector.MOLECULE_BOX, 'g');
@@ -159,12 +159,12 @@ export class Presentation {
 
         // Specials
         if (this.model.getSpecialEraser()) {
-            this.surface.query(SVGSelector.ERASER_ICON).click(() => {
+            this.surface.onClickOrTouch(SVGSelector.ERASER_ICON, () => {
                 this.model.startPlacingEraserSpecial();
             });
         }
         if (this.model.getSpecialTunnel()) {
-            this.surface.query(SVGSelector.TUNNEL_ICON).click(() => {
+            this.surface.onClickOrTouch(SVGSelector.TUNNEL_ICON, () => {
                 this.model.startPlacingTunnelSpecial();
             });
         }
@@ -186,7 +186,7 @@ export class Presentation {
     private buildBond(type: BondType, site: string, translation: string, id: string) {
         if (type === BondType.NONE) return;
 
-        this.surface.prependFragment(`assets/images/bond_${type as string}_${site}.svg`, id.replace('b', 'ab' + site), 'g', translation);
+        this.surface.appendFragment(`assets/images/bond_${type as string}_${site}.svg`, id.replace('b', 'ab' + site), 'g', translation);
     }
 
     public tearDown() {
@@ -275,7 +275,7 @@ export class Presentation {
 
     public showLevelPassedMessage(): void {
         this.surface.appendFragment('assets/images/passed.svg', 'passed', 'g', null, false, (element) => {
-            element.click(() => {
+            SVGSurface.onClickOrTouchElement(element, () => {
                 Application.onNextLevel();
             });
         });
@@ -283,7 +283,7 @@ export class Presentation {
 
     public showLevelFailedMessage(): void {
         this.surface.appendFragment('assets/images/failed.svg', 'failed', 'g', null, false, (element) => {
-            element.click(() => {
+            SVGSurface.onClickOrTouchElement(element, () => {
                 Application.onNextLevel();
             });
         });
@@ -291,18 +291,18 @@ export class Presentation {
 
     public showEraserSpecialMessage(): void {
         this.surface.appendFragment('assets/images/special_1.svg', 'eraser-message', 'g', null, false, (element) => {
-            element.click(() => {
+            SVGSurface.onClickOrTouchElement(element, () => {
                 Application.onStartLevelTimer();
-                this.surface.remove('#eraser-message');
+                this.surface.remove(SVGSelector.ERASER_MESSAGE);
             });
         });
     }
 
     public showPortalSpecialMessage(): void {
         this.surface.appendFragment('assets/images/special_2.svg', 'portal-message', 'g', null, false, (element) => {
-            element.click(() => {
+            SVGSurface.onClickOrTouchElement(element, () => {
                 Application.onStartLevelTimer();
-                this.surface.remove('#portal-message');
+                this.surface.remove(SVGSelector.PORTAL_MESSAGE);
             });
         });
     }
@@ -310,13 +310,13 @@ export class Presentation {
     public showGameWonMessage(finalScore: number): void {
         this.surface.removeAll('g');
         this.surface.appendFragment('assets/images/won.svg', 'won', 'g', null, false, (element) => {
-            element.select('#skip').click(() => {
+            SVGSurface.onClickOrTouchElement(element.select(SVGSelector.SKIP), () => {
                 document.location.reload();
             });
-            element.select('#skip-text').click(() => {
+            SVGSurface.onClickOrTouchElement(element.select(SVGSelector.SKIP_TEXT), () => {
                 document.location.reload();
             });
-            element.select('#final-score tspan').node.textContent = finalScore.toString();
+            element.select(SVGSelector.FINAL_SCORE).node.textContent = finalScore.toString();
         });
     }
 }
@@ -331,6 +331,11 @@ enum SVGSelector {
     ERASER_TEXT = '#eraser-text',
     TUNNEL_ICON = '#tunnel',
     TUNNEL_TEXT = '#tunnel-text',
+    FINAL_SCORE = '#final-score tspan',
+    SKIP_TEXT = '#skip-text',
+    SKIP = '#skip',
+    ERASER_MESSAGE = '#eraser-message',
+    PORTAL_MESSAGE = '#portal-message',
 
     ARROW_UP = '#arrow-u',
     ARROW_RIGHT = '#arrow-r',
